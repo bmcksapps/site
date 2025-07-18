@@ -1,0 +1,18 @@
+{
+    "version":  "0.1.0",
+    "name":  "financeai",
+    "scripts":  {
+                    "preview":  "vite preview",
+                    "build":  "vite build",
+                    "dev":  "vite",
+                    "start":  "vite"
+                },
+    "devDependencies":  {
+                            "vite":  "^7.0.0"
+                        },
+    "dependencies":  {
+                         "react":  "^18.2.0",
+                         "react-dom":  "^18.2.0"
+                     },
+    "private":  true
+}
