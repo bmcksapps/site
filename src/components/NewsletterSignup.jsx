@@ -1,60 +1,76 @@
-// src/components/NewsletterSignup.jsx
 import { useState } from "react";
 
 export default function NewsletterSignup() {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus("sending");
 
-    const res = await fetch("https://formspree.io/f/mqkrbzyv", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({ email }),
-    });
+    if (!email.includes("@")) {
+      setError("Please enter a valid email address.");
+      return;
+    }
 
-    const result = await res.json();
-    if (result.ok || result.success) {
-      setStatus("success");
-      setEmail("");
-    } else {
-      setStatus("error");
+    try {
+      const res = await fetch("https://formspree.io/f/xgvzvdep", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (res.ok) {
+        setSubmitted(true);
+        setEmail("");
+        setError("");
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
+    } catch {
+      setError("Network error. Try again later.");
     }
   };
 
   return (
-    <section className="bg-[#12151c] p-8 rounded-2xl shadow-lg max-w-3xl mx-auto text-center">
-      <h3 className="text-2xl font-semibold mb-4 text-white">Stay in the Loop</h3>
-      <p className="text-gray-400 mb-6">
-        Get updates on new AI apps, productivity tips, and weekly insights.
+    <div className="bg-gray-900 text-white p-6 rounded-3xl shadow-inner shadow-[#1c1f26]/30 border border-[#1c1f26] backdrop-blur-sm hover:shadow-blue-500/10 hover:scale-[1.01] transition-all max-w-xl mx-auto my-12">
+      <h2 className="text-2xl font-bold mb-3 text-center">
+        Join the Movement — Unlock AI Drops & Early Access Weekly
+      </h2>
+      <p className="text-sm text-gray-400 mb-4 text-center">
+        The smartest app newsletter you'll read this week — straight from the lab at BMCKSAPPS.
       </p>
-      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 justify-center">
-        <input
-          type="email"
-          placeholder="you@example.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="w-full sm:w-auto flex-1 p-3 rounded-xl text-black"
-        />
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-xl"
-        >
-          Subscribe
-        </button>
-      </form>
-      {status === "success" && (
-        <p className="text-green-400 mt-4">Thanks! You're subscribed.</p>
+
+      {submitted ? (
+        <p className="text-green-400 font-medium text-center">
+          ✅ You're subscribed!
+        </p>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="email"
+            required
+            placeholder="Enter your best email..."
+            className="w-full p-3 rounded bg-gray-800 border border-gray-700 placeholder-gray-500 text-center"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 transition py-2 rounded font-semibold"
+          >
+            Subscribe
+          </button>
+          {error && (
+            <p className="text-red-400 text-sm text-center">{error}</p>
+          )}
+        </form>
       )}
-      {status === "error" && (
-        <p className="text-red-400 mt-4">Something went wrong. Try again.</p>
-      )}
-    </section>
+
+      <div className="mt-6 text-center text-gray-400 text-sm italic">
+        🔥 Join <span className="text-white font-bold">128+</span> creators already subscribed
+      </div>
+    </div>
   );
 }
+

@@ -3,7 +3,8 @@ import Header from "../components/Header";
 import AppCard from "../components/AppCard";
 import NewsletterSignup from "../components/NewsletterSignup";
 import AdSpotlight from "../components/AdSpotlight";
-import Footer from "../components/Footer";
+import TestimonialSection from "../components/TestimonialSection";
+import AppShowcase from "../components/AppShowcase";
 
 export default function Home() {
   return (
@@ -11,15 +12,21 @@ export default function Home() {
       <Header />
 
       <main className="max-w-6xl mx-auto px-4 py-16">
-        <section className="text-center mb-20">
-          <h2 className="text-4xl font-bold mb-4 text-blue-400 animate-fade-in">
-            Innovative digital experiences powered by AI
+        {/* 🔥 Hero Section with embedded CTA */}
+        <section className="text-center mb-20 max-w-4xl mx-auto">
+          <h2 className="text-5xl font-extrabold mb-6 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-500 bg-clip-text text-transparent animate-fade-in">
+            Innovative Digital Experiences, Powered by AI
           </h2>
-          <p className="text-lg text-gray-300 animate-fade-in delay-200">
-            Calm, clarity, and control in every app.
+          <p className="text-lg text-gray-300 mb-10 animate-fade-in delay-200">
+            Calm, clarity, and control — built into every app.
           </p>
+
+          <div className="animate-fade-in delay-300">
+            <NewsletterSignup />
+          </div>
         </section>
 
+        {/* 💡 App Cards */}
         <section id="apps" className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
           <AppCard
             title="MindReset"
@@ -53,16 +60,17 @@ export default function Home() {
           />
         </section>
 
-        <div id="newsletter" className="mt-24">
-          <NewsletterSignup />
-        </div>
+        {/* 💬 Testimonials */}
+        <TestimonialSection />
 
+        {/* 🌟 App Showcase Grid */}
+        <AppShowcase />
+
+        {/* 📢 Ad or Promo Spot */}
         <div className="mt-16">
           <AdSpotlight />
         </div>
       </main>
-
-      <Footer />
     </>
   );
 }
