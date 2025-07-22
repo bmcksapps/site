@@ -1,154 +1,143 @@
 // src/pages/MindReset.jsx
-import { useState, useEffect, useRef } from "react";
-import { supabase } from "../supabaseClient";
+import { useEffect, useRef, useState } from "react";
 
 export default function MindReset() {
-  const [isBreathing, setIsBreathing] = useState(false);
-  const [inhale, setInhale] = useState(true);
-  const [timer, setTimer] = useState(4);
-  const [journalInput, setJournalInput] = useState("");
-  const [journalResponse, setJournalResponse] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [audioOn, setAudioOn] = useState(true);
-  const audioRef = useRef(null);
-  const voiceRef = useRef(null);
+  const [isRunning, setIsRunning] = useState(false);
+  const [currentPhase, setCurrentPhase] = useState(0);
+  const [phase, setPhase] = useState("inhale");
+  const [audioEnabled, setAudioEnabled] = useState(true);
+  const [showJournal, setShowJournal] = useState(false);
+  const [journalEntry, setJournalEntry] = useState("");
+  const [aiResponse, setAiResponse] = useState("");
+
+  const ambientRef = useRef(null);
+  const phases = [
+    { label: "inhale", duration: 5000 },
+    { label: "hold", duration: 5000 },
+    { label: "exhale", duration: 5000 },
+  ];
+  const soundsRef = useRef({
+    inhale: new Audio("/audio/inhale_voice.mp3"),
+    hold: new Audio("/audio/hold_voice.mp3"),
+    exhale: new Audio("/audio/exhale_voice.mp3"),
+  });
 
   useEffect(() => {
-    let interval;
-    if (isBreathing) {
-      interval = setInterval(() => {
-        setInhale((prev) => !prev);
-        setTimer(4);
-      }, 4000);
+    let timeout;
+    if (isRunning) {
+      const phaseData = phases[currentPhase];
+      setPhase(phaseData.label);
+      if (audioEnabled && soundsRef.current[phaseData.label]) {
+        soundsRef.current[phaseData.label].play();
+      }
+
+      timeout = setTimeout(() => {
+        setCurrentPhase((prev) => (prev + 1) % phases.length);
+      }, phaseData.duration);
+
+      if (audioEnabled && ambientRef.current) {
+        ambientRef.current.currentTime = 0;
+        ambientRef.current.play();
+      }
     }
-    return () => clearInterval(interval);
-  }, [isBreathing]);
+    return () => clearTimeout(timeout);
+  }, [isRunning, currentPhase, audioEnabled]);
 
-  useEffect(() => {
-    let countdown;
-    if (isBreathing) {
-      countdown = setInterval(() => {
-        setTimer((prev) => (prev > 1 ? prev - 1 : 4));
-      }, 1000);
+  const handleJournalSubmit = async () => {
+    try {
+      const res = await fetch("/.netlify/functions/journal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ entry: journalEntry })
+      });
+      const data = await res.json();
+      setAiResponse(data.insight || "No response from AI.");
+    } catch (err) {
+      console.error("Journal API Error:", err);
+      setAiResponse("There was an error processing your entry.");
     }
-    return () => clearInterval(countdown);
-  }, [isBreathing]);
-
-  useEffect(() => {
-    if (audioRef.current) {
-      if (audioOn) audioRef.current.play();
-      else audioRef.current.pause();
-    }
-  }, [audioOn]);
-
-  useEffect(() => {
-    if (voiceRef.current && isBreathing && audioOn) {
-      voiceRef.current.src = inhale ? "/inhale.mp3" : "/exhale.mp3";
-      voiceRef.current.play();
-    }
-  }, [inhale]);
-
-  const handleJournal = async () => {
-    setLoading(true);
-    setJournalResponse("");
-
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are a calming journaling guide helping users reflect and reset their mind. Keep responses uplifting and insightful.",
-          },
-          {
-            role: "user",
-            content: journalInput,
-          },
-        ],
-      }),
-    });
-
-    const data = await res.json();
-    const text = data.choices?.[0]?.message?.content;
-    setJournalResponse(text);
-    setLoading(false);
-
-    await supabase.from("mindreset_journals").insert([
-      {
-        entry: journalInput,
-        ai_response: text,
-        created_at: new Date().toISOString(),
-      },
-    ]);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0d1117] to-[#1c1f26] text-white p-8 font-sans">
-      <audio ref={audioRef} loop src="/ambient.mp3" preload="auto" />
-      <audio ref={voiceRef} />
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#0d1117] text-white text-center p-8">
+      <audio ref={ambientRef} src="/ambient.mp3" loop preload="auto" />
 
-      <div className="text-center mb-12">
-        <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600 animate-fade-in">
-          Breathe. Focus. Transform.
-        </h1>
-        <p className="text-lg text-gray-400 mt-4 max-w-xl mx-auto animate-fade-in delay-200">
-          The world’s first AI-powered mental clarity engine.
-        </p>
+      <div className="w-48 h-48 mb-8">
+        <img
+          src="/images/blue_orb.png"
+          alt="Breathing Orb"
+          className={`w-full h-full object-contain transition-transform duration-1000 ease-in-out ${phase === "inhale" ? "scale-125" : "scale-100"}`}
+        />
+      </div>
+
+      <h1 className="text-4xl font-bold mb-4">🧘‍♂️ MindReset</h1>
+      <p className="mb-4 text-xl text-blue-300">{phase.toUpperCase()}</p>
+
+      <div className="space-x-4 mb-8">
         <button
-          onClick={() => setAudioOn(!audioOn)}
-          className="mt-4 text-sm text-blue-300 underline hover:text-blue-400"
+          className="px-6 py-2 bg-green-600 hover:bg-green-700 rounded-lg"
+          onClick={() => setIsRunning(true)}
         >
-          {audioOn ? "🔊 Ambient On" : "🔇 Ambient Off"}
+          Start
+        </button>
+        <button
+          className="px-6 py-2 bg-red-600 hover:bg-red-700 rounded-lg"
+          onClick={() => setIsRunning(false)}
+        >
+          Stop
+        </button>
+        <button
+          className={`px-6 py-2 ${audioEnabled ? "bg-blue-500" : "bg-gray-500"} rounded-lg`}
+          onClick={() => setAudioEnabled(!audioEnabled)}
+        >
+          {audioEnabled ? "Audio On" : "Audio Off"}
+        </button>
+        <button
+          className="px-6 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg"
+          onClick={() => setShowJournal(true)}
+        >
+          📝 Journal
         </button>
       </div>
 
-      <div className="bg-[#161a23] p-6 rounded-2xl mb-12 shadow-md border border-[#2b2e35] max-w-3xl mx-auto text-center animate-fade-in delay-300">
-        <h2 className="text-2xl font-semibold mb-4">🧘 FocusFlow™ Breathing Session</h2>
-        <div className="text-4xl font-bold text-blue-400 mb-1">
-          {isBreathing ? (inhale ? "Inhale..." : "Exhale...") : "Start Session"}
-        </div>
-        <div className="text-2xl text-gray-400 mb-2">{isBreathing ? timer : ""}</div>
-        <div className="h-6 w-full mb-4">
-          <div
-            className={`h-full transition-all duration-700 ${inhale ? "bg-blue-500 w-full" : "bg-blue-300 w-2/3"}`}
-          ></div>
-        </div>
-        <div className="animate-pulse w-6 h-6 rounded-full mx-auto mb-4 bg-blue-400"></div>
-        <button
-          className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white"
-          onClick={() => setIsBreathing((prev) => !prev)}
-        >
-          {isBreathing ? "Stop" : "Begin"}
-        </button>
+      <div className="text-sm text-gray-400">
+        Want unlimited breathing sessions and custom music?&nbsp;
+        <a href="/stripe" className="text-blue-400 underline hover:text-blue-300">
+          Upgrade to Premium
+        </a>
       </div>
 
-      <div className="bg-[#161a23] p-6 rounded-2xl shadow-md border border-[#2b2e35] max-w-3xl mx-auto animate-fade-in delay-500">
-        <h2 className="text-2xl font-semibold mb-4">📝 Reflect with AI</h2>
-        <textarea
-          className="w-full p-4 rounded bg-[#0d1117] border border-gray-700 text-white mb-4"
-          rows="4"
-          placeholder="What's on your mind today?"
-          value={journalInput}
-          onChange={(e) => setJournalInput(e.target.value)}
-        ></textarea>
-        <button
-          onClick={handleJournal}
-          className="px-6 py-2 bg-green-600 hover:bg-green-700 rounded text-white mb-4"
-        >
-          {loading ? "Thinking..." : "Reflect with AI"}
-        </button>
-        {journalResponse && (
-          <div className="bg-[#1c1f26] p-4 rounded border border-gray-700 text-green-300 whitespace-pre-line">
-            {journalResponse}
+      {showJournal && (
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-80 flex items-center justify-center z-50">
+          <div className="bg-[#1c1f26] p-6 rounded-lg w-full max-w-md text-left">
+            <h2 className="text-xl font-bold mb-4">Reflect with MindReset 🧠</h2>
+            <textarea
+              rows="4"
+              className="w-full p-2 rounded bg-gray-800 text-white mb-4"
+              value={journalEntry}
+              onChange={(e) => setJournalEntry(e.target.value)}
+              placeholder="Write how you're feeling..."
+            />
+            <button
+              className="bg-green-600 px-4 py-2 rounded hover:bg-green-700"
+              onClick={handleJournalSubmit}
+            >
+              Get Insight
+            </button>
+            <button
+              className="ml-4 text-sm text-gray-400 hover:text-white"
+              onClick={() => setShowJournal(false)}
+            >
+              Close
+            </button>
+            {aiResponse && (
+              <div className="mt-4 p-3 bg-gray-900 rounded text-sm text-green-300 whitespace-pre-wrap">
+                {aiResponse}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
