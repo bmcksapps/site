@@ -1,3 +1,4 @@
+
 const fetch = require('node-fetch');
 
 exports.handler = async function (event, context) {
@@ -21,10 +22,18 @@ exports.handler = async function (event, context) {
 
     const data = await response.json();
 
+    if (!data || !data.choices || !data.choices[0]) {
+      console.error("OpenAI response error:", data);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "Invalid response from OpenAI." })
+      };
+    }
+
     return {
       statusCode: 200,
       body: JSON.stringify({
-        insight: data.choices?.[0]?.message?.content || "No insight generated"
+        insight: data.choices[0].message.content
       })
     };
   } catch (error) {
@@ -35,4 +44,3 @@ exports.handler = async function (event, context) {
     };
   }
 };
-
