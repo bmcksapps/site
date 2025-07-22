@@ -45,7 +45,7 @@ export default function MindReset() {
 
   const handleJournalSubmit = async () => {
     try {
-      const res = await fetch("/.netlify/functions/journal", {
+      const res = await fetch("/api/mindJournal", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ entry: journalEntry })
