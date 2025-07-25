@@ -1,28 +1,21 @@
+// src/utils/saveToSupabase.js
+import { supabase } from '../lib/supabase';
+
 export async function saveToSupabase(email) {
-  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-  const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/subscribers`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-        Prefer: "return=representation"
-      },
-      body: JSON.stringify({ email }),
-    });
+    const { data, error } = await supabase
+      .from('subscribers')
+      .insert([{ email }])
+      .select(); // returns the new record
 
-    if (!res.ok) {
-      const errorData = await res.json();
-      console.error("Supabase insert error:", errorData);
-      throw new Error("Failed to save to Supabase");
+    if (error) {
+      console.error("❌ Supabase insert error:", error);
+      return null;
     }
 
-    return await res.json();
+    return data;
   } catch (err) {
-    console.error("Supabase error:", err.message);
+    console.error("❌ Supabase error:", err.message);
     return null;
   }
 }

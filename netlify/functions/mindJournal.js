@@ -8,7 +8,7 @@ exports.handler = async function (event, context) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.VITE_OPENAI_API_KEY}`  // ✅ Matches your env key
+        Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`  // ✅ Matches your env key
       },
       body: JSON.stringify({
         model: "gpt-4",

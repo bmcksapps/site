@@ -1,0 +1,17 @@
+[To Do: AI Voice Generation]
+
+Please generate a calm female voice reading the following script for a breathing exercise:
+
+Script:
+- "Inhale..." (5 second pause)
+- "Hold..." (5 second pause)
+- "Exhale..." (5 second pause)
+
+Requirements:
+- Tone: Calm, soothing, natural rhythm
+- File format: MP3
+- Duration: 15 seconds
+- Loop-ready with soft fade in/out
+- Filename: voice.mp3
+
+Usage: This file will be used in a wellness app to guide 5-5-5 breathing cycles.

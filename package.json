@@ -23,6 +23,7 @@
     "framer-motion": "^12.23.6",
     "lucide-react": "^0.525.0",
     "react-markdown": "^10.1.0",
-    "react-router-dom": "^7.7.0"
+    "react-router-dom": "^7.7.0",
+    "wavesurfer.js": "^7.10.1"
   }
 }
