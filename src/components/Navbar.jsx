@@ -47,7 +47,8 @@ export default function Navbar() {
           <button onClick={() => navigate("/writer")} className="hover:text-blue-400 transition">AI Writer</button>
           <button onClick={goToBlog} className="hover:text-blue-400 transition">Blog</button>
           <button onClick={() => navigate("/login")} className="hover:text-pink-400 transition">Login</button>
-        <button onClick={() => navigate("/contact")} className="hover:text-blue-400 transition">Contact</button>
+          <button onClick={() => navigate("/signup")} className="hover:text-pink-400 transition">Sign Up</button>
+          <button onClick={() => navigate("/contact")} className="hover:text-blue-400 transition">Contact</button>
         </div>
 
         <div className="md:hidden text-white">
@@ -65,6 +66,7 @@ export default function Navbar() {
           <button onClick={() => navigate("/writer")}>AI Writer</button>
           <button onClick={goToBlog}>Blog</button>
           <button onClick={() => navigate("/contact")}>Contact</button>
+          <button onClick={() => navigate("/signup")} className="hover:text-pink-400 transition">Sign Up</button>
           <button onClick={() => navigate("/login")} className="text-pink-400">Login</button>
         </div>
       )}
