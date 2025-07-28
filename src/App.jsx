@@ -18,6 +18,20 @@ import BlogWriter from "./pages/BlogWriter";
 import Writer from "./pages/Writer";
 import Access from "./pages/Access";
 import StripeLanding from './pages/StripeLanding';
+import AdminDashboard from "./pages/AdminDashboard";
+import Contact from "./pages/Contact";
+import Referral from "./pages/Referral";
+import TestimonialSubmit from "./pages/TestimonialSubmit";
+import Subscribe from "./pages/Subscribe";
+import Cancel from "./pages/Cancel";
+import Login from './pages/Login';
+import SignUp from "./pages/SignUp";
+import ResetPassword from './pages/ResetPassword';
+import MyPlan from "./pages/MyPlan";
+import Terms from "./pages/Terms";
+import About from './pages/About'; 
+import AIWriter from './pages/AIWriter';
+
 
 // ✅ MindReset Components
 import AudioManager from './components/AudioManager';
@@ -25,6 +39,7 @@ import WaveformVisualizer from './components/WaveformVisualizer';
 import SettingsPanel from './components/SettingsPanel';
 import BreathOrb from './components/BreathOrb';
 import JournalReflection from './components/JournalReflection';
+
 
 export default function App() {
   // 🔊 Global audio state
@@ -60,6 +75,20 @@ export default function App() {
           <Route path="/blogwriter" element={<BlogWriter />} />
           <Route path="/access" element={<Access />} />
           <Route path="/stripe" element={<StripeLanding />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/referral" element={<Referral />} />
+          <Route path="/testimonial" element={<TestimonialSubmit />} />
+          <Route path="/subscribe" element={<Subscribe />} />
+          <Route path="/cancel" element={<Cancel />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/my-plan" element={<MyPlan />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/aiwriter" element={<AIWriter />} />
+
 
           {/* 🧘‍♂️ MindReset Launch Route */}
           <Route

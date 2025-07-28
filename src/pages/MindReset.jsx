@@ -42,6 +42,10 @@ const MindReset = () => {
   const [pulse, setPulse] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
 
+  
+  return profile?.is_premium ? <PremiumContent /> : <UpgradePrompt />;
+
+  
   useEffect(() => {
     async function fetchUserData() {
       const { data: { user } } = await supabase.auth.getUser();
